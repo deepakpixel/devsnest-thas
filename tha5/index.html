@@ -30,3 +30,176 @@
     </div>
   </div>
 </div>
+
+
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500&display=swap");
+* {
+  box-sizing: border-box;
+  margin: 0px;
+  font-size: 16px;
+}
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.calculator-container {
+  max-width: 200px;
+  margin: 10px;
+}
+.calculator {
+  padding: 10px;
+  background-color: #43658b;
+  border-radius: 5px;
+}
+.buttons-container {
+  font-family: "Roboto", sans-serif;
+  display: grid;
+  grid-template-columns: 40px 40px 40px 40px;
+  grid-gap: 5px;
+  justify-content: center;
+  align-items: center;
+}
+button {
+  user-select: none;
+  cursor: pointer;
+  box-shadow: -8px -8px 12px 0 rgba(75, 75, 75, 0.25) inset;
+  border-radius: 5px;
+  min-height: 40px;
+  outline: none;
+  border: 2px solid black;
+}
+button:hover {
+  box-shadow: -8px -8px 12px 0 rgba(172, 172, 172, 0.25) inset;
+}
+button:active {
+  box-shadow: -8px -8px 25px 0 #a2d5f2a6 inset;
+  border-color: #a2d5f2;
+}
+button:first-child {
+  grid-column: 2 / 4;
+}
+button:last-child {
+  grid-column: 3 / 5;
+}
+.display {
+  width: 175px;
+  font-family: "Orbitron", sans-serif;
+  background-color: #b2deec;
+  border: 1px black solid;
+  border-radius: 5px;
+  position: relative;
+  margin: 10px 0px;
+  padding: 5px;
+}
+.a {
+  font-size: 18px;
+  font-weight: bolder;
+}
+.a,
+.b,
+.res {
+  min-height: 20px;
+}
+#a,
+#b {
+  max-width: 100%;
+  word-wrap: break-word;
+  float: right;
+}
+#tempRes,
+.res {
+  word-wrap: break-word;
+}
+.secondary {
+  position: relative;
+  word-wrap: break-word;
+  clear: both;
+}
+
+</style>
+
+<script>
+let a = "",
+  b = "",
+  op,
+  res,
+  tempRes,
+  buffer = "",
+  firstTime = true;
+
+var handleEvent = (e) => {
+  e.preventDefault();
+  e.key = e.target.dataset.key;
+  if (buffer == "." && buffer == e.key) return;
+  buffer = e.key;
+
+  if (
+    !(
+      isNumber(e) ||
+      isOperator(e) ||
+      e.key == "Backspace" ||
+      e.key == "Enter" ||
+      e.key == "."
+    )
+  )
+    return;
+
+  if (firstTime && (isNumber(e) || e.key == "Backspace" || e.key == ".")) {
+    if (e.key == "Backspace") a = a.substr(0, a.length - 1);
+    else a += e.key;
+  } else if (isOperator(e)) {
+    if (a) {
+      firstTime = false;
+      if (a && b) {
+        res = operate(+a, +b, op);
+        b = "";
+        a = "" + res;
+        tempRes = "";
+      }
+      op = e.key;
+    }
+  } else {
+    if (e.key == "Enter") {
+      if (a && b) {
+        tempRes = "=" + operate(+a, +b, op);
+        res = operate(+a, +b, op);
+        firstTime = true;
+        a = "" + res;
+        b = "";
+        op = "";
+        tempRes = "";
+      }
+    } else if (e.key == "Backspace") b = b.substr(0, b.length - 1);
+    else b += e.key;
+    if (a && b) {
+      tempRes = "=" + operate(+a, +b, op);
+    }
+  }
+  document.getElementById("a").innerText = a || "";
+  document.getElementById("b").innerText = b || "";
+  // document.getElementById("res").innerText = res || "";
+  document.getElementById("tempRes").innerText = tempRes || "";
+  document.getElementById("op").innerText = op || "";
+};
+
+function isNumber(e) {
+  return e.key >= 0 && e.key <= 9;
+}
+function isOperator(e) {
+  return e.key == "+" || e.key == "-" || e.key == "*" || e.key == "/";
+}
+function operate(a, b, op) {
+  return eval(a + op + b);
+}
+
+let buttons = document.querySelectorAll("button");
+buttons.forEach((button) => {
+  button.addEventListener("click", handleEvent);
+});
+
+  
+</script>
